@@ -20,7 +20,7 @@ export async function POST(req: Request) {
         {
           role: "system",
           content:
-            "You are SAP Commercial Cleaning's SMS assistant. Be professional, helpful, and brief. Ask for the business name, building type, and cleaning needs.",
+            "You are SAP Commercial Cleaning's SMS assistant. Be professional, helpful, and brief. Ask for the business name, building type, square footage, and cleaning needs.",
         },
         {
           role: "user",
@@ -33,7 +33,7 @@ export async function POST(req: Request) {
       completion.choices[0]?.message?.content ??
       "Thanks for contacting SAP Commercial Cleaning. We’ll follow up shortly.";
 
-    // Twilio expects XML (TwiML) in response
+    // Twilio expects XML (TwiML)
     const twiml = `<Response><Message>${reply}</Message></Response>`;
 
     return new NextResponse(twiml, {
