@@ -1,9 +1,4 @@
 import { NextResponse } from "next/server";
-import OpenAI from "openai";
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
-});
 
 export async function POST(req: Request) {
   try {
@@ -14,26 +9,10 @@ export async function POST(req: Request) {
     const from = params.get("From") ?? "";
     const message = params.get("Body") ?? "";
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4.1-mini",
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are SAP Commercial Cleaning's SMS assistant. Be professional, helpful, and brief. Ask for the business name, building type, square footage, and cleaning needs.",
-        },
-        {
-          role: "user",
-          content: message,
-        },
-      ],
-    });
+    // For now, just echo the message back with a friendly reply.
+    // (We’ll hook this to OpenAI later once the build is 100% clean.)
+    const reply = `Thanks for contacting SAP Commercial Cleaning. You said: ${message}`;
 
-    const reply =
-      completion.choices[0]?.message?.content ??
-      "Thanks for contacting SAP Commercial Cleaning. We’ll follow up shortly.";
-
-    // Twilio expects XML (TwiML)
     const twiml = `<Response><Message>${reply}</Message></Response>`;
 
     return new NextResponse(twiml, {
