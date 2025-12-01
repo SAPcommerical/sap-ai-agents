@@ -1,26 +1,29 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import OpenAI from "openai";
 
-export async function POST(req: Request) {
-  try {
-    // Twilio sends data as x-www-form-urlencoded
-    const body = await req.text();
-    const params = new URLSearchParams(body);
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY!,
+});
 
-    const from = params.get("From") ?? "";
-    const message = params.get("Body") ?? "";
+// Simple TwiML voice response for now.
+// We can upgrade this later to a full AI phone agent.
+export async function POST(req: NextRequest) {
+  const twiml = `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="polly.Joanna">
+    Thank you for calling S A P Commercial Cleaning.
+    Please send us a text message with your building size and cleaning needs,
+    and a specialist will follow up shortly.
+  </Say>
+</Response>`;
 
-    // For now, just echo the message back with a friendly reply.
-    // (We’ll hook this to OpenAI later once the build is 100% clean.)
-    const reply = `Thanks for contacting SAP Commercial Cleaning. You said: ${message}`;
+  return new NextResponse(twiml, {
+    status: 200,
+    headers: { "Content-Type": "text/xml" },
+  });
+}
 
-    const twiml = `<Response><Message>${reply}</Message></Response>`;
-
-    return new NextResponse(twiml, {
-      status: 200,
-      headers: { "Content-Type": "text/xml" },
-    });
-  } catch (err) {
-    console.error("SMS route error:", err);
-    return new NextResponse("Error", { status: 500 });
-  }
+export async function GET() {
+  // Health check / test route
+  return NextResponse.json({ ok: true, route: "voice" });
 }
